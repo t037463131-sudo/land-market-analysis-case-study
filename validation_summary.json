@@ -1,0 +1,8 @@
+{
+  "transaction_count": 53,
+  "parcel_detail_row_count": 87,
+  "distinct_parcel_identifier_count": 71,
+  "orphan_parcel_rows": 0,
+  "transactions_outside_rounding_tolerance": 0,
+  "rows_with_nonzero_rounded_area_difference": 4
+}

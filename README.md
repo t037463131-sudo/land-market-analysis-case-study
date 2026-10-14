@@ -1,28 +1,58 @@
-# Land Market Analysis: Anonymized Case Study
+# Land Market Analysis: Case Study and Python/SQL Pipeline
 
-A public summary of a professional land-market analysis project by Shun-Min Tang. It demonstrates transaction screening, reconciliation of parcel-detail records, and the effect of potentially related transactions on comparable-price summaries.
+A public land-market case study with a Python/SQLite data-preparation extension. The original case summary documents transaction screening and comparable-selection reasoning. The executable extension was created on October 15, 2026, from the supplied source workbook during portfolio preparation; it is not evidence that the same code was used in the earlier workplace analysis.
 
 ## Business question
-How can a small, heterogeneous set of land transactions support an initial comparable-price review, and where is the evidence insufficient for a property-specific valuation?
+How can transaction-level sales and parcel-detail records be reconciled before assessing industrial-land comparables?
 
-## Evidence and method
-The supplied workbook combines transaction records and parcel-detail records, classification rules, grouped statistics, and document-check notes. Transactions were screened for mixed zoning, special conditions, partial-interest transfers, and other comparability concerns. A 250-ping threshold separated core from secondary industrial comparables; it is a project rule rather than an industry standard.
+## Executable Python and SQL workflow
+- Read the source Excel export with Python and `openpyxl`.
+- Convert ROC dates to Gregorian ISO dates, parse numeric strings, and standardize area and price units.
+- Load transactions and parcel details into separate SQLite tables with primary keys, foreign keys, and an index.
+- Use SQL joins, aggregation, conditional expressions, and views to reconcile transferred areas and flag records for manual review.
+- Preserve repeated parcel identifiers when their detail rows represent additional transferred area.
 
-Potentially related sales were retained as individual records and also summarized in analytical groups. Grouping is an inference, not confirmation that multiple records are a single independent transaction. Area reconciliation retains repeated parcel-detail rows where they represent additional transferred area rather than duplicate data.
+## Verified execution
+The supplied source workbook produced:
+| Check | Result |
+| --- | --- |
+| Transactions | 53 |
+| Parcel-detail rows | 87 |
+| Distinct parcel identifiers | 71 |
+| Orphan parcel-detail records | 0 |
+| Transactions with a nonzero area difference | 4 |
+| Transactions outside the rounding tolerance | 0 |
 
-## Results
-See `screening_summary.csv` for aggregate screening counts. The core sample contains eight transactions but only six analytical groups, illustrating how record counts can overstate the amount of independent evidence. The source workbook reports no eligible industrial observations in 2024–2025. This sparse coverage limits conclusions about annual price trends.
-
-## Decision implications
-The analysis supports further due diligence and a disciplined comparable-selection process. The subject's zoning verification, rights and encumbrances, and differences in site size remain material limitations. Sample quartiles describe observed comparables; they are not a valuation confidence interval. A mechanically scaled price range is not a final valuation.
-
-## Public scope and verification
-This package contains only an anonymized narrative and aggregate counts, not a reproducible transaction dataset. Exact site identifiers, parcel numbers, ownership names, rights records, financing amounts, and subject-specific price estimates are omitted. Aggregate counts were checked against the supplied workbook.
-
-No Python/SQL scripts or computational GIS files were supplied with this workbook, so this public package does not claim to demonstrate those implementations. Spatial evidence in the supplied method notes consists of document/map review rather than verified geocoding of all transactions.
+The tolerance is 0.005 ping per detail row plus 0.005 ping for the transaction total, assuming rounding to two decimals. It is a reconciliation assumption, not a guarantee that source areas are accurate. Record counts, unit conversion, date conversion, repeated-parcel handling, and the SQL review views were checked.
 
 ## Files
-- `screening_summary.csv`: aggregate screening categories
-- `methodology.md`: data preparation and evidence limits
+- `land_pipeline.py`: Excel import, SQLite creation, SQL execution, and local exports
+- `analysis_queries.sql`: parcel aggregation, area reconciliation, and screening-flag views
+- `requirements.txt`: Python dependency
+- `validation_summary.json`: aggregate results from the source workbook
+- `screening_summary.csv`: previously reviewed screening categories, totaling 53 transactions
+- `methodology.md`: case-study methodology and evidence limits
 
-The original workbook is intentionally excluded from the public portfolio.
+The category summary reflects the earlier manual review. It is not automatically reproduced by the new script. The script's flags do not establish eligibility or prove normal-market transactions.
+
+## Reproduce locally
+Requires Python 3.10+ and the original Excel export containing the sheets `案件列表` and `土地`. The original source workbook is not distributed here.
+
+```bash
+python3 -m pip install -r requirements.txt
+python3 land_pipeline.py "/path/to/source.xlsx" --out work_results
+```
+
+Use a new output directory for each run. The program refuses to overwrite an existing database. It generates a local SQLite database, row-level reconciliation and screening CSVs, annual record counts, and an aggregate validation summary. Without the source workbook, this public repository is not independently executable end to end.
+
+## Case-study context
+The original manual screening separated 8 core industrial transactions, 7 secondary industrial transactions, 15 agricultural/other-zone comparisons, and 23 excluded special-condition transactions. Core transactions were summarized as six analytical groups to account for potentially related sales. The absence of eligible industrial observations in 2024–2025 limits annual-trend interpretation. A 250-ping core threshold is a project rule, not an industry standard.
+
+## Spatial work and limitations
+The earlier case involved review of the Ministry of the Interior's web-based transaction map, cadastral maps, and ownership documents. This Python/SQL extension contains no geocoding, QGIS processing, or spatial joins. It does not establish a final valuation. Comparable selection still needs manual review of zoning, transaction conditions, possible relationships, site differences, and documentary evidence.
+
+## Public and private files
+Only code, methodology, and aggregate results are included. Source parcel identifiers are imported into the local database for reconciliation but are not bundled in this public package. Generated SQLite files and row-level exports must remain private; `.gitignore` helps prevent accidental inclusion through Git, but browser uploads must be reviewed separately.
+
+## Author and preparation
+Shun-Min Tang. Original workbook supplied by the author. Python/SQL extension developed with AI assistance on October 15, 2026, and executed against that workbook. The extension should be described as a new portfolio implementation rather than a historical work artifact.
