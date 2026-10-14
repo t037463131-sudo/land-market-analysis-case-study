@@ -55,4 +55,4 @@ The earlier case involved review of the Ministry of the Interior's web-based tra
 Only code, methodology, and aggregate results are included. Source parcel identifiers are imported into the local database for reconciliation but are not bundled in this public package. Generated SQLite files and row-level exports must remain private; `.gitignore` helps prevent accidental inclusion through Git, but browser uploads must be reviewed separately.
 
 ## Author and preparation
-Shun-Min Tang. Original workbook supplied by the author. Python/SQL extension developed with AI assistance on October 15, 2026, and executed against that workbook. The extension should be described as a new portfolio implementation rather than a historical work artifact.
+Shun-Min Tang. Original workbook supplied by the author. 
